@@ -1,0 +1,9 @@
+main: com.rooxchicken.arcane.Arcane
+name: ArcanePlugin
+version: 0.1
+api-version: '1.20'
+
+commands:
+   hdn_verifymod:
+      description: Client verification of mod
+      usage: /hdn_verifymod
