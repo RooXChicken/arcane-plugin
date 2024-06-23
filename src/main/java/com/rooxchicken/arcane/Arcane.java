@@ -61,10 +61,7 @@ import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
 import com.google.common.base.Predicate;
 import com.rooxchicken.arcane.Abilities.CrystalAbilities;
-import com.rooxchicken.arcane.Commands.FirstAbility;
-import com.rooxchicken.arcane.Commands.ResetCooldown;
-import com.rooxchicken.arcane.Commands.SecondAbility;
-import com.rooxchicken.arcane.Commands.SkillTree;
+import com.rooxchicken.arcane.Commands.PrintHeldItemCommand;
 import com.rooxchicken.arcane.Commands.VerifyMod;
 import com.rooxchicken.arcane.Data.ScepterData;
 import com.rooxchicken.arcane.Data.SkillData;
@@ -160,6 +157,8 @@ public class Arcane extends JavaPlugin implements Listener
         getServer().getPluginManager().registerEvents(this, this);
         getServer().getPluginManager().registerEvents(crystalAbilities, this);
 
+        this.getCommand("printname").setExecutor(new PrintHeldItemCommand(this));
+
         this.getCommand("hdn_verifymod").setExecutor(new VerifyMod(this));
 		blockedCommands.add("hdn_verifymod");
         
@@ -187,6 +186,8 @@ public class Arcane extends JavaPlugin implements Listener
                     t.onCancel();
                     tasks.remove(t);
                 }
+
+                crystalAbilities.tick();
             }
         }, 0, 1);
 

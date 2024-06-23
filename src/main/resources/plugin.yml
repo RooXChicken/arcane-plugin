@@ -7,5 +7,8 @@ commands:
    hdn_verifymod:
       description: Client verification of mod
       usage: /hdn_verifymod
+   printname:
+      description: Prints the name of the currently held item (debugging)
+      usage: /printname
 
 depend: [ProtocolLib]
