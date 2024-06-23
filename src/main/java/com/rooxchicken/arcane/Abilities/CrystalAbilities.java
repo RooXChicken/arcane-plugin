@@ -1,6 +1,10 @@
 package com.rooxchicken.arcane.Abilities;
 
+import java.util.HashMap;
+
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Color;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -15,6 +19,7 @@ import org.bukkit.potion.PotionEffectType;
 import com.rooxchicken.arcane.Arcane;
 import com.rooxchicken.arcane.Library;
 import com.rooxchicken.arcane.Tasks.ChainTask;
+import com.rooxchicken.arcane.Tasks.CrystalCircleTask;
 import com.rooxchicken.arcane.Tasks.ShadowTask;
 
 public class CrystalAbilities implements Listener
@@ -33,7 +38,9 @@ public class CrystalAbilities implements Listener
     private String chainCrystal = "§x§D§1§6§3§4§1§lChain Crystal";
     private String shadowCrystal = "§x§3§1§4§2§A§5§lShadow Crystal";
 
-    public CrystalAbilities(Arcane _plugin) { plugin = _plugin; }
+    private HashMap<Player, CrystalCircleTask> crystalParticlesMap;
+
+    public CrystalAbilities(Arcane _plugin) { plugin = _plugin; crystalParticlesMap = new HashMap<Player, CrystalCircleTask>(); }
 
     @EventHandler
     public void damageEvents(EntityDamageEvent event)
@@ -135,9 +142,56 @@ public class CrystalAbilities implements Listener
                 String[] split = item.getItemMeta().getDisplayName().split("§");
                 String name = split[split.length-1].substring(1);
 
-                Library.sendPlayerData(player, "4_" + name + "_" + checkScepter(item, scepter));
+                boolean upgraded = checkScepter(item, scepter);
+                Library.sendPlayerData(player, "4_" + name + "_" + upgraded);
+                if(!crystalParticlesMap.containsKey(player))
+                {
+                    CrystalCircleTask task = new CrystalCircleTask(plugin, player);
+                    Arcane.tasks.add(task);
+                    crystalParticlesMap.put(player, task);
+                }
+
+                crystalParticlesMap.get(player).upgraded = upgraded;
+                crystalParticlesMap.get(player).color = getColor(item.getItemMeta().getDisplayName());
+                //player.getWorld().spawnParticle(Particle.REDSTONE, player.getLocation().clone().add(0, 0.2, 0), 6, 0.3, 0.2, 0.3, new Particle.DustOptions(getColor(item.getItemMeta().getDisplayName()), (upgraded) ? 1 : 0.5f));
+            }
+            else
+            {
+                if(crystalParticlesMap.containsKey(player))
+                {
+                    crystalParticlesMap.get(player).cancel = true;
+                    crystalParticlesMap.remove(player);
+                }
             }
         }
+    }
+
+    private Color getColor(String itemName)
+    {
+        if(itemName.equals(glacialCrystal))
+            return Color.BLUE;
+        if(itemName.equals(infernalCrystal))
+            return Color.fromRGB(0xAA0000);
+        if(itemName.equals(lightningCrystal))
+            return Color.fromRGB(0x8CB6FF);
+        if(itemName.equals(venomousCrystal))
+            return Color.fromRGB(0x4DB560);
+        if(itemName.equals(vampiricCrystal))
+            return Color.fromRGB(0x660000);
+        if(itemName.equals(shiningCrystal))
+            return Color.fromRGB(0xFFD700);
+        if(itemName.equals(explosionCrystal))
+            return Color.fromRGB(0xD16341);
+        if(itemName.equals(oceanicCrystal))
+            return Color.fromRGB(0xA4DDED);
+        if(itemName.equals(windCrystal))
+            return Color.fromRGB(0xD0E8C3);
+        if(itemName.equals(chainCrystal))
+            return Color.fromRGB(0xD16341);
+        if(itemName.equals(shadowCrystal))
+            return Color.fromRGB(0x3142A5);
+
+        return Color.WHITE;
     }
 
     private boolean checkName(ItemStack item, String name)
