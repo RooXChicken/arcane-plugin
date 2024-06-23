@@ -96,49 +96,62 @@ public class Arcane extends JavaPlugin implements Listener
                 {
                     if(component.toString().contains("Mana"))
                     {
+                        int offset = 0;
+                        ItemStack scepter = event.getPlayer().getInventory().getItemInMainHand();
+                        if(scepter != null && scepter.hasItemMeta() && scepter.getItemMeta().getDisplayName().contains("Shadow"))
+                        {
+                            offset = 8;
+                        }
+                        //try{
                         //Bukkit.getLogger().info(component.toString());
                         String[] data = component.toString().split("\"");
                         int mana = Integer.parseInt(data[15].trim());
                         int maxMana = Integer.parseInt(data[27].trim());
-                        String manaUse = data[37].substring(6).trim();
-                        String name = data[47].split(":")[0].trim();
-                        String cooldown = data[47].split(":")[1].trim();
-                        String nameColor = data[43];
+                        String manaUse = data[37+offset];
+                        if(offset != 0)
+                            manaUse = " Cost: " + manaUse;
+                        manaUse = manaUse.substring(6).trim();
+                        if(offset != 0 && manaUse.equals("3"))
+                        {
+                            offset += 10;
+                            manaUse += "/s";
+                        }
+                        String name = data[47+offset].split(":")[0].trim();
+                        String cooldown = data[47+offset].split(":")[1].trim();
+                        String nameColor = data[43+offset];
                         nameColor = nameColor.replace("_", "-");
-                        String costColor = data[33];
+                        String costColor = data[33+offset];
                         costColor = costColor.replace("_", "-");
                         String cooldownColor = data[43];
                         int bloodIndex = 0;
                         boolean blood = false;
                         String bloodUsage = " ";
-                        //Bukkit.getLogger().info(cooldown);
-                        if(cooldown.equals(""))//!cooldown.contains("READY") && !cooldown.contains("ACTIVE") && !cooldown.contains("INACTIVE") && !cooldown.contains("CHARGING") && !cooldown.contains("FOLLOW") && !cooldown.contains("ACTIVE"))
+                        //}
+                        //catch(Exception e)
+                        //{
+                            //Bukkit.getLogger().info(cooldown);
+                        //}
+                        
+                        
+                        if(cooldown.equals(""))
                         {
-                            cooldown = data[55].trim();
-                            cooldownColor = data[51].trim();
+                            cooldown = data[55+offset].trim();
+                            cooldownColor = data[51+offset].trim();
                             cooldown += "s";
 
-                            if(data.length >= 71 && data[71].contains("Blood"))
-                            {
+                            if(data.length >= 71+offset && data[71+offset].contains("Blood"))
                                 bloodIndex = 79;
-                            }
                         }
-                        else if(data.length >= 55 && data[55].contains("Blood"))
-                        {
+                        else if(data.length >= 55+offset && data[55+offset].contains("Blood"))
                             bloodIndex = 63;
-                        }
 
                         if(bloodIndex != 0)
                         {
                             blood = true;
-                            bloodUsage = data[bloodIndex+8];
+                            bloodUsage = data[bloodIndex+8+offset];
                         }
                         if(name.contains("Life Drain"))
-                        {
                             blood = true;
-                            //bloodUsage = "/3";
-                        }
-                        //Bukkit.getLogger().info(blood);
 
                         cooldownColor = cooldownColor.replace("_", "-");
                         
