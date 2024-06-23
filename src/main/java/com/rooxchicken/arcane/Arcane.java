@@ -60,7 +60,7 @@ import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
 import com.google.common.base.Predicate;
-import com.rooxchicken.arcane.Abilities.Ability;
+import com.rooxchicken.arcane.Abilities.CrystalAbilities;
 import com.rooxchicken.arcane.Commands.FirstAbility;
 import com.rooxchicken.arcane.Commands.ResetCooldown;
 import com.rooxchicken.arcane.Commands.SecondAbility;
@@ -77,9 +77,9 @@ public class Arcane extends JavaPlugin implements Listener
     public ArrayList<Player> hasMod;
 
     private List<String> blockedCommands = new ArrayList<>();
-    public ArrayList<ScepterData> scepterData;
 
     private ProtocolManager protocolManager;
+    private CrystalAbilities crystalAbilities;
 
     @Override
     public void onEnable()
@@ -99,34 +99,66 @@ public class Arcane extends JavaPlugin implements Listener
                 {
                     if(component.toString().contains("Mana"))
                     {
+                        //Bukkit.getLogger().info(component.toString());
                         String[] data = component.toString().split("\"");
                         int mana = Integer.parseInt(data[15].trim());
                         int maxMana = Integer.parseInt(data[27].trim());
                         String manaUse = data[37].substring(6).trim();
-                        String name = data[47].trim();
+                        String name = data[47].split(":")[0].trim();
                         String cooldown = data[47].split(":")[1].trim();
+                        String nameColor = data[43];
+                        nameColor = nameColor.replace("_", "-");
+                        String costColor = data[33];
+                        costColor = costColor.replace("_", "-");
+                        String cooldownColor = data[43];
+                        int bloodIndex = 0;
+                        boolean blood = false;
+                        String bloodUsage = " ";
                         if(!cooldown.contains("READY") && !cooldown.contains("ACTIVE") && !cooldown.contains("INACTIVE") && !cooldown.contains("CHARGING"))
                         {
                             cooldown = data[55].trim();
+                            cooldownColor = data[51].trim();
+
+                            if(data.length >= 71 && data[71].contains("Blood"))
+                            {
+                                bloodIndex = 79;
+                            }
                         }
-                        else
-                            name = name.split(":")[0];
+                        else if(data.length >= 55 && data[55].contains("Blood"))
+                        {
+                            bloodIndex = 63;
+                        }
+
+                        if(bloodIndex != 0)
+                        {
+                            blood = true;
+                            bloodUsage = data[bloodIndex+8];
+                        }
+                        if(name.contains("Life Drain"))
+                        {
+                            blood = true;
+                            //bloodUsage = "/3";
+                        }
+                        //Bukkit.getLogger().info(blood);
+
+                        cooldownColor = cooldownColor.replace("_", "-");
                         
-                        Library.sendPlayerData(event.getPlayer(), "1_" + manaUse + "_" + name + "_" + cooldown);
+                        Library.sendPlayerData(event.getPlayer(), "1_" + manaUse + "_" + name + "_" + cooldown + "_" + nameColor + "_" + costColor + "_" + cooldownColor + "_" + bloodUsage + "_" + blood);
                         event.setCancelled(true);
                     }
                 }
             }
         });
 
+        
         tasks = new ArrayList<Task>();
         tasks.add(new PullDataFromDatapack(this));
         hasMod = new ArrayList<Player>();
 
-        scepterData = new ArrayList<ScepterData>();
-        fillScepterData();
+        crystalAbilities = new CrystalAbilities(this);
 
         getServer().getPluginManager().registerEvents(this, this);
+        getServer().getPluginManager().registerEvents(crystalAbilities, this);
 
         this.getCommand("hdn_verifymod").setExecutor(new VerifyMod(this));
 		blockedCommands.add("hdn_verifymod");
@@ -162,16 +194,6 @@ public class Arcane extends JavaPlugin implements Listener
             Library.sendPlayerData(player, "0");
 
         getLogger().info("Arcane SMP (featuring 1987 different plugins!) (made by roo)");
-    }
-
-    private void fillScepterData()
-    {
-        HashMap<String, SkillData> skills = new HashMap<String, SkillData>();
-        scepterData.add(new ScepterData(0, "Glacial", ""));
-
-        skills.clear();
-        skills.put("", new SkillData("Ray of Frost", 0, "ASGlacialCD1"));
-        scepterData.get(0).skills = skills;
     }
 
     @EventHandler

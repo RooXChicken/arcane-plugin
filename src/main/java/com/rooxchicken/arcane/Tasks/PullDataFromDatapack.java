@@ -25,7 +25,7 @@ public class PullDataFromDatapack extends Task
     {
         for(Player player : plugin.hasMod)
         {
-            Library.sendPlayerData(player, "2_" + scoreboard.getObjective("ASMana").getScore(player.getName()).getScore() + "_" + scoreboard.getObjective("ASMaxMana").getScore(player.getName()).getScore());
+            Library.sendPlayerData(player, "2_" + scoreboard.getObjective("ASMana").getScore(player.getName()).getScore() + "_" + scoreboard.getObjective("ASMaxMana").getScore(player.getName()).getScore() + "_" + scoreboard.getObjective("ASBloodStacks").getScore(player.getName()).getScore());
             Library.sendPlayerData(player, "3");
         }
     }

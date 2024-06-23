@@ -7,3 +7,5 @@ commands:
    hdn_verifymod:
       description: Client verification of mod
       usage: /hdn_verifymod
+
+depend: [ProtocolLib]
