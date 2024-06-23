@@ -25,9 +25,6 @@ public class PrintHeldItemCommand implements CommandExecutor
         ItemStack item = Bukkit.getPlayer(sender.getName()).getInventory().getItemInMainHand();
         Bukkit.getLogger().info(item.getItemMeta().getDisplayName());
 
-        // plugin.setCooldownForce(Bukkit.getPlayer(sender.getName()), 0, Infinity.ability1CooldownKey);
-        // plugin.setCooldownForce(Bukkit.getPlayer(sender.getName()), 0, Infinity.ability2CooldownKey);
-
         return true;
     }
 

@@ -111,10 +111,12 @@ public class Arcane extends JavaPlugin implements Listener
                         int bloodIndex = 0;
                         boolean blood = false;
                         String bloodUsage = " ";
-                        if(!cooldown.contains("READY") && !cooldown.contains("ACTIVE") && !cooldown.contains("INACTIVE") && !cooldown.contains("CHARGING"))
+                        //Bukkit.getLogger().info(cooldown);
+                        if(cooldown.equals(""))//!cooldown.contains("READY") && !cooldown.contains("ACTIVE") && !cooldown.contains("INACTIVE") && !cooldown.contains("CHARGING") && !cooldown.contains("FOLLOW") && !cooldown.contains("ACTIVE"))
                         {
                             cooldown = data[55].trim();
                             cooldownColor = data[51].trim();
+                            cooldown += "s";
 
                             if(data.length >= 71 && data[71].contains("Blood"))
                             {
