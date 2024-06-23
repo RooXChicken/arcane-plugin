@@ -203,7 +203,9 @@ public class CrystalAbilities implements Listener
     {
         if(crystal != null && scepter != null && crystal.hasItemMeta() && scepter.hasItemMeta())
         {
-            String crystalName = crystal.getItemMeta().getDisplayName();
+            String[] split = crystal.getItemMeta().getDisplayName().split("§");
+            String crystalName = split[split.length-1].substring(1);
+            
             String scepterName = scepter.getItemMeta().getDisplayName();
 
             return scepterName.contains(crystalName.split(" ")[0]);
