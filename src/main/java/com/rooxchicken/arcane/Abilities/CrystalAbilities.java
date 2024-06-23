@@ -13,6 +13,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import com.rooxchicken.arcane.Arcane;
+import com.rooxchicken.arcane.Library;
 import com.rooxchicken.arcane.Tasks.ChainTask;
 import com.rooxchicken.arcane.Tasks.ShadowTask;
 
@@ -124,11 +125,31 @@ public class CrystalAbilities implements Listener
                     player.removePotionEffect(PotionEffectType.POISON);
                 }
             }
+
+            if(hasCrystal(item))
+            {
+                String[] name = item.getItemMeta().getDisplayName().split("§");
+                Library.sendPlayerData(player, "4_" + name[name.length-1].substring(1));
+            }
         }
     }
 
     private boolean checkName(ItemStack item, String name)
     {
         return (item != null && item.hasItemMeta() && item.getItemMeta().getDisplayName().equals(name));
+    }
+
+    public boolean hasCrystal(ItemStack item)
+    {
+        if(item != null && item.hasItemMeta())
+        {
+            String name = item.getItemMeta().getDisplayName();
+            if(name.equals(glacialCrystal) || name.equals(infernalCrystal) || name.equals(lightningCrystal) || name.equals(venomousCrystal) || name.equals(vampiricCrystal) || name.equals(shiningCrystal) || name.equals(explosionCrystal) || name.equals(oceanicCrystal) || name.equals(windCrystal) || name.equals(chainCrystal)|| name.equals(shadowCrystal))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
