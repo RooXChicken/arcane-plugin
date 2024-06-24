@@ -43,6 +43,8 @@ public class CrystalCircleTask extends Task
     @Override
     public void run()
     {
+        if(player == null || !player.isOnline())
+            cancel = true;
         player.getWorld().spawnParticle(Particle.REDSTONE, player.getLocation().clone().add(cacheX[i], 0, cacheZ[i]), 1, 0, 0, 0, new Particle.DustOptions(color, upgraded ? 2 : 1));
         player.getWorld().spawnParticle(Particle.REDSTONE, player.getLocation().clone().add(cacheX[i+90], 0, cacheZ[i+90]), 1, 0, 0, 0, new Particle.DustOptions(color, upgraded ? 2 : 1));
     
