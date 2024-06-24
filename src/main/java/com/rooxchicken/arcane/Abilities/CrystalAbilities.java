@@ -20,6 +20,7 @@ import com.rooxchicken.arcane.Arcane;
 import com.rooxchicken.arcane.Library;
 import com.rooxchicken.arcane.Tasks.ChainTask;
 import com.rooxchicken.arcane.Tasks.CrystalCircleTask;
+import com.rooxchicken.arcane.Tasks.PreventMultipleScepters;
 import com.rooxchicken.arcane.Tasks.ShadowTask;
 
 public class CrystalAbilities implements Listener
@@ -55,7 +56,7 @@ public class CrystalAbilities implements Listener
 
             if(checkName(item, explosionCrystal) && (event.getCause() == DamageCause.BLOCK_EXPLOSION || event.getCause() == DamageCause.ENTITY_EXPLOSION))
             {
-                event.setDamage(event.getDamage() * 0.7 * (checkScepter(item, player.getInventory().getItemInMainHand()) ? 0.8 : 1));
+                event.setDamage(event.getDamage() * 0.7 * (checkScepter(item, PreventMultipleScepters.playerScepterMap.get(event.getEntity())) ? 0.8 : 1));
             }
         }
     }
@@ -75,34 +76,34 @@ public class CrystalAbilities implements Listener
         ItemStack damagerOffhandItem = damager.getInventory().getItemInOffHand();
         ItemStack damagerMainhandItem = damager.getInventory().getItemInMainHand();
 
-        if(checkName(playerOffhandItem, glacialCrystal) && Math.random() < 0.1 * (checkScepter(playerOffhandItem, playerMainhandItem) ? 2 : 1))
+        if(checkName(playerOffhandItem, glacialCrystal) && Math.random() < 0.1 * (checkScepter(playerOffhandItem, PreventMultipleScepters.playerScepterMap.get(player)) ? 2 : 1))
         {
             damager.setFreezeTicks(240);
             damager.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 60, 1));
         }
 
-        if(checkName(damagerOffhandItem, infernalCrystal) && Math.random() < 0.1 * (checkScepter(damagerOffhandItem, damagerMainhandItem) ? 2 : 1))
+        if(checkName(damagerOffhandItem, infernalCrystal) && Math.random() < 0.1 * (checkScepter(damagerOffhandItem, PreventMultipleScepters.playerScepterMap.get(damager)) ? 2 : 1))
         {
             player.getWorld().spawnParticle(Particle.FLAME, player.getEyeLocation(), 30);
             event.setDamage(event.getDamage() + 4);
         }
 
-        if(checkName(damagerOffhandItem, lightningCrystal) && Math.random() < 0.1 * (checkScepter(damagerOffhandItem, damagerMainhandItem) ? 2 : 1))
+        if(checkName(damagerOffhandItem, lightningCrystal) && Math.random() < 0.1 * (checkScepter(damagerOffhandItem, PreventMultipleScepters.playerScepterMap.get(damager)) ? 2 : 1))
         {
             player.getWorld().strikeLightningEffect(player.getLocation());
             event.setDamage(event.getDamage() + 6);
         }
 
-        if(checkName(damagerOffhandItem, vampiricCrystal) && Math.random() < 0.1 * (checkScepter(damagerOffhandItem, damagerMainhandItem) ? 2 : 1))
+        if(checkName(damagerOffhandItem, vampiricCrystal) && Math.random() < 0.1 * (checkScepter(damagerOffhandItem, PreventMultipleScepters.playerScepterMap.get(damager)) ? 2 : 1))
         {
             player.setHealth(player.getHealth() - 2);
             damager.setHealth(damager.getHealth() + 2);
         }
 
-        if(checkName(damagerOffhandItem, shiningCrystal) && Math.random() < 0.1 * (checkScepter(damagerOffhandItem, damagerMainhandItem) ? 2 : 1))
+        if(checkName(damagerOffhandItem, shiningCrystal) && Math.random() < 0.1 * (checkScepter(damagerOffhandItem, PreventMultipleScepters.playerScepterMap.get(damager)) ? 2 : 1))
             damager.setHealth(damager.getHealth() + event.getFinalDamage());
 
-        if(checkName(damagerOffhandItem, chainCrystal) && Math.random() < 0.1 * (checkScepter(damagerOffhandItem, damagerMainhandItem) ? 2 : 1))
+        if(checkName(damagerOffhandItem, chainCrystal) && Math.random() < 0.1 * (checkScepter(damagerOffhandItem, PreventMultipleScepters.playerScepterMap.get(damager)) ? 2 : 1))
             Arcane.tasks.add(new ChainTask(plugin, player));
 
         if(player.getHealth() - event.getFinalDamage() < 4 && checkName(playerOffhandItem, shadowCrystal) && Math.random() < 0.4)
@@ -116,23 +117,22 @@ public class CrystalAbilities implements Listener
         for(Player player : Bukkit.getOnlinePlayers())
         {
             ItemStack item = player.getInventory().getItemInOffHand();
-            ItemStack scepter = player.getInventory().getItemInMainHand();
-
+            
             if(checkName(item, oceanicCrystal))
             {
-                player.addPotionEffect(new PotionEffect(PotionEffectType.DOLPHINS_GRACE, 21, (checkScepter(item, scepter) ? 1 : 0)));
-                player.addPotionEffect(new PotionEffect(PotionEffectType.CONDUIT_POWER, 21, (checkScepter(item, scepter) ? 1 : 0)));
+                player.addPotionEffect(new PotionEffect(PotionEffectType.DOLPHINS_GRACE, 21, (checkScepter(item, PreventMultipleScepters.playerScepterMap.get(player)) ? 1 : 0)));
+                player.addPotionEffect(new PotionEffect(PotionEffectType.CONDUIT_POWER, 21, (checkScepter(item, PreventMultipleScepters.playerScepterMap.get(player)) ? 1 : 0)));
             }
 
             if(checkName(item, windCrystal))
-                player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 21, (checkScepter(item, scepter) ? 1 : 0)));
+                player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 21, (checkScepter(item, PreventMultipleScepters.playerScepterMap.get(player)) ? 1 : 0)));
 
             if(checkName(item, venomousCrystal))
             {
                 if(player.hasPotionEffect(PotionEffectType.POISON))
                 {
                     PotionEffect poison = player.getPotionEffect(PotionEffectType.POISON);
-                    player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, (int)(poison.getDuration() * (checkScepter(item, scepter) ? 1.1: 1)), poison.getAmplifier() + (checkScepter(item, scepter) ? 1 : 0)));
+                    player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, (int)(poison.getDuration() * (checkScepter(item, PreventMultipleScepters.playerScepterMap.get(player)) ? 1.1: 1)), poison.getAmplifier() + (checkScepter(item, PreventMultipleScepters.playerScepterMap.get(player)) ? 1 : 0)));
                     player.removePotionEffect(PotionEffectType.POISON);
                 }
             }
@@ -142,7 +142,7 @@ public class CrystalAbilities implements Listener
                 String[] split = item.getItemMeta().getDisplayName().split("§");
                 String name = split[split.length-1].substring(1);
 
-                boolean upgraded = checkScepter(item, scepter);
+                boolean upgraded = checkScepter(item, PreventMultipleScepters.playerScepterMap.get(player));
                 Library.sendPlayerData(player, "4_" + name + "_" + upgraded);
                 if(!crystalParticlesMap.containsKey(player))
                 {
@@ -199,16 +199,14 @@ public class CrystalAbilities implements Listener
         return (item != null && item.hasItemMeta() && item.getItemMeta().getDisplayName().equals(name));
     }
 
-    private boolean checkScepter(ItemStack crystal, ItemStack scepter)
+    private boolean checkScepter(ItemStack crystal, String scepter)
     {
-        if(crystal != null && scepter != null && crystal.hasItemMeta() && scepter.hasItemMeta())
+        if(crystal != null && scepter != null && crystal.hasItemMeta())
         {
             String[] split = crystal.getItemMeta().getDisplayName().split("§");
             String crystalName = split[split.length-1].substring(1);
-            
-            String scepterName = scepter.getItemMeta().getDisplayName();
 
-            return scepterName.contains(crystalName.split(" ")[0]);
+            return scepter.contains(crystalName.split(" ")[0]);
         }
 
         return false;

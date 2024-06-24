@@ -25,7 +25,7 @@ public class Library
      * GUIDE:
      * _ seperates parts of data
      * 
-     * 1: infb63_ marks the signature for data
+     * 1: arc912_ marks the signature for data
      * 2: mode: (0 is for login. marks ability type) (1 marks ability cooldown) (2 sends ability data) (3 opens selection dialogue)
      * 2.0_1: marks ability type
      * 2.1_1: ability type (0 for primary, 1 for unlockable)
@@ -35,7 +35,7 @@ public class Library
      */
     public static void sendPlayerData(Player player, String data)
     {
-        player.sendMessage("infb63_" + data);
+        player.sendMessage("arc912_" + data);
     }
 
     // public static void markRemoval(Player player)

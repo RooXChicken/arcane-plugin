@@ -1,5 +1,7 @@
 package com.rooxchicken.arcane.Tasks;
 
+import java.util.HashMap;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -15,53 +17,43 @@ import com.rooxchicken.arcane.Arcane;
 
 public class PreventMultipleScepters extends Task implements Listener
 {
+    public static HashMap<Player, String> playerScepterMap;
+
     public PreventMultipleScepters(Arcane _plugin)
     {
         super(_plugin);
         tickThreshold = 40;
 
         Bukkit.getServer().getPluginManager().registerEvents(this, _plugin);
+
+        playerScepterMap = new HashMap<Player, String>();
     }
 
     @Override
     public void run()
     {
+        playerScepterMap.clear();
         for(Player player : Bukkit.getOnlinePlayers())
         {
-            if(scepterCount(player.getInventory()) > 1)
-            {
-                dropAdditional(player);
-            }
+            scepterCount(player);
         }
     }
 
-    // @EventHandler
-    // private void preventMoving(InventoryClickEvent event)
-    // {
-    //     if(!event.getAction().equals(InventoryAction.PICKUP_ALL) && !event.getAction().equals(InventoryAction.PICKUP_HALF) && !event.getAction().equals(InventoryAction.PICKUP_ONE) && !event.getAction().equals(InventoryAction.PICKUP_SOME))
-    //         event.setCancelled(scepterCount(event.getWhoClicked().getInventory()) > 0);
-    // }
-
-    @EventHandler
-    private void preventPickup(EntityPickupItemEvent event)
+    private int scepterCount(Player player)
     {
-        if(event.getEntity() instanceof Player)
-        {
-            ItemStack item = event.getItem().getItemStack();
-            if(item != null && item.getType() == Material.CARROT_ON_A_STICK)
-            {
-                event.setCancelled(scepterCount(((Player)event.getEntity()).getInventory()) > 0);
-            }
-        }
-    }
-
-    private int scepterCount(Inventory inv)
-    {
+        Inventory inv = player.getInventory();
         int count = 0;
         for(ItemStack item : inv)
         {
-            if(item != null && item.getType() == Material.CARROT_ON_A_STICK)
+            if(item != null && item.hasItemMeta() && item.getType() == Material.CARROT_ON_A_STICK)
             {
+                if(count == 0)
+                    playerScepterMap.put(player, item.getItemMeta().getDisplayName());
+                else
+                {
+                    player.getWorld().dropItemNaturally(player.getLocation(), item);
+                    player.getInventory().remove(item);
+                }
                 count++;
             }
         }
@@ -69,20 +61,15 @@ public class PreventMultipleScepters extends Task implements Listener
         return count;
     }
 
-    private void dropAdditional(Player player)
+    @EventHandler
+    private void preventPickup(EntityPickupItemEvent event)
     {
-        int count = 0;
-        for(ItemStack item : player.getInventory())
+        if(event.getEntity() instanceof Player)
         {
-            if(item != null && item.getType() == Material.CARROT_ON_A_STICK)
+            ItemStack item = event.getItem().getItemStack();
+            if(item != null && item.hasItemMeta() && item.getType() == Material.CARROT_ON_A_STICK)
             {
-                if(count > 0)
-                {
-                    player.getWorld().dropItemNaturally(player.getLocation(), item);
-                    player.getInventory().remove(item);
-                }
-                count++;
-
+                event.setCancelled(scepterCount((Player)event.getEntity()) > 0);
             }
         }
     }

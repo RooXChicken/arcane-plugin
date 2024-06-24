@@ -100,6 +100,9 @@ public class Arcane extends JavaPlugin implements Listener
             @Override
             public void onPacketSending(PacketEvent event)
             {
+                if(!hasMod.contains(event.getPlayer()))
+                    return;
+                
                 List<WrappedChatComponent> components = event.getPacket().getChatComponents().getValues();
                 for (WrappedChatComponent component : components)
                 {
