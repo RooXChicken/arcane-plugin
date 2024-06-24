@@ -25,8 +25,10 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryEvent;
 import org.bukkit.event.inventory.InventoryInteractEvent;
@@ -39,9 +41,11 @@ import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerToggleFlightEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
@@ -65,8 +69,13 @@ import com.rooxchicken.arcane.Commands.PrintHeldItemCommand;
 import com.rooxchicken.arcane.Commands.VerifyMod;
 import com.rooxchicken.arcane.Data.ScepterData;
 import com.rooxchicken.arcane.Data.SkillData;
+import com.rooxchicken.arcane.Tasks.PreventMultipleScepters;
 import com.rooxchicken.arcane.Tasks.PullDataFromDatapack;
 import com.rooxchicken.arcane.Tasks.Task;
+
+import net.minecraft.commands.arguments.ArgumentScoreholder.c;
+import net.minecraft.server.network.TextFilter.e;
+import net.minecraft.world.level.biome.Climate.h;
 
 public class Arcane extends JavaPlugin implements Listener
 {
@@ -165,6 +174,7 @@ public class Arcane extends JavaPlugin implements Listener
         
         tasks = new ArrayList<Task>();
         tasks.add(new PullDataFromDatapack(this));
+        tasks.add(new PreventMultipleScepters(this));
         hasMod = new ArrayList<Player>();
 
         crystalAbilities = new CrystalAbilities(this);
@@ -230,13 +240,6 @@ public class Arcane extends JavaPlugin implements Listener
 		e.getCommands().removeAll(blockedCommands);
 	}
     
-    @EventHandler
-    private void preventKick(PlayerKickEvent event)
-    {
-        if(event.getReason().equals("Kicked for spamming"))
-            event.setCancelled(true);
-    }
-
     public void verifyMod(Player player)
     {
         if(!hasMod.contains(player))
