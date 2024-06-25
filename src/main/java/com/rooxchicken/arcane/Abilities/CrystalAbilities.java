@@ -11,6 +11,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
@@ -124,18 +125,14 @@ public class CrystalAbilities implements Listener
                 player.addPotionEffect(new PotionEffect(PotionEffectType.CONDUIT_POWER, 21, (checkScepter(item, PreventMultipleScepters.playerScepterMap.get(player)) ? 1 : 0)));
             }
 
-            if(checkName(item, windCrystal))
-                player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 21, (checkScepter(item, PreventMultipleScepters.playerScepterMap.get(player)) ? 1 : 0)));
-
             if(checkName(item, venomousCrystal))
             {
                 if(player.hasPotionEffect(PotionEffectType.POISON))
-                {
-                    PotionEffect poison = player.getPotionEffect(PotionEffectType.POISON);
-                    player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, (int)(poison.getDuration() * (checkScepter(item, PreventMultipleScepters.playerScepterMap.get(player)) ? 1.1: 1)), poison.getAmplifier() + (checkScepter(item, PreventMultipleScepters.playerScepterMap.get(player)) ? 1 : 0)));
                     player.removePotionEffect(PotionEffectType.POISON);
-                }
             }
+
+            if(checkName(item, windCrystal))
+                player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 21, (checkScepter(item, PreventMultipleScepters.playerScepterMap.get(player)) ? 1 : 0)));
 
             if(hasCrystal(item))
             {
@@ -192,6 +189,28 @@ public class CrystalAbilities implements Listener
             return Color.fromRGB(0x3142A5);
 
         return Color.WHITE;
+    }
+
+    @EventHandler
+    private void replacePoison(EntityPotionEffectEvent event)
+    {
+        if(event.getNewEffect() == null || !(event.getEntity() instanceof Player) || !event.getNewEffect().getType().equals(PotionEffectType.POISON))
+            return;
+
+        Player player = (Player)event.getEntity();
+        ItemStack item = player.getInventory().getItemInOffHand();
+
+        if(checkName(item, venomousCrystal))
+        {
+            PotionEffect poison = event.getNewEffect();
+
+            if(poison.getType().equals(PotionEffectType.POISON))
+            {
+                event.setCancelled(true);
+                player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, (int)(poison.getDuration() * (checkScepter(item, PreventMultipleScepters.playerScepterMap.get(player)) ? 1.1: 1)), poison.getAmplifier() + (checkScepter(item, PreventMultipleScepters.playerScepterMap.get(player)) ? 1 : 0)));
+                player.removePotionEffect(PotionEffectType.POISON);
+            }
+        }
     }
 
     private boolean checkName(ItemStack item, String name)
